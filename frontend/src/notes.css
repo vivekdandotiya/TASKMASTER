@@ -1,0 +1,538 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ==================== NOTES CONTAINER ==================== */
+
+.notes-container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding: 40px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* ==================== HEADER ==================== */
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.notes-header h1 {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.redirect-btn,
+.calc-btn,
+.theme-toggle-notes {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.calc-btn {
+  padding: 12px 16px;
+  min-width: 48px;
+  justify-content: center;
+}
+
+.theme-toggle-notes {
+  padding: 12px 16px;
+  min-width: 48px;
+  justify-content: center;
+}
+
+.redirect-btn:hover,
+.calc-btn:hover,
+.theme-toggle-notes:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.redirect-btn:active,
+.calc-btn:active,
+.theme-toggle-notes:active {
+  transform: translateY(0);
+}
+
+.theme-toggle-notes svg {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle-notes:hover svg {
+  transform: rotate(15deg);
+}
+
+/* ==================== INPUT BOX ==================== */
+
+.note-input-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 28px;
+  border-radius: 16px;
+  margin-bottom: 40px;
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: all 0.3s ease;
+}
+
+.note-input-box:hover {
+  box-shadow: 0 4px 16px var(--shadow-color);
+}
+
+.note-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.note-input-box input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.note-input-box input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: var(--bg-tertiary);
+}
+
+.note-input-box input::placeholder {
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.note-input-box textarea {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.note-input-box textarea:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: var(--bg-tertiary);
+}
+
+.note-input-box textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.note-input-box button {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.note-input-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.note-input-box button:active {
+  transform: translateY(0);
+}
+
+/* ==================== NOTES GRID ==================== */
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.note-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  animation: scaleIn 0.4s ease-out;
+}
+
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.note-card:hover::before {
+  transform: scaleX(1);
+}
+
+.note-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px var(--shadow-color);
+  border-color: var(--accent-primary);
+}
+
+.note-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.note-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  word-wrap: break-word;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.note-card p::-webkit-scrollbar {
+  width: 4px;
+}
+
+.note-card p::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.note-card p::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.note-card p::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-hover);
+}
+
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.note-actions svg {
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.note-actions svg:hover {
+  color: var(--accent-primary);
+  background: var(--bg-secondary);
+  transform: scale(1.1);
+}
+
+.note-actions svg:first-child:hover {
+  color: var(--accent-info);
+}
+
+.note-actions svg:last-child:hover {
+  color: var(--accent-danger);
+}
+
+.note-actions svg:active {
+  transform: scale(0.95);
+}
+
+/* ==================== EMPTY STATE ==================== */
+
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* ==================== CALCULATOR MODAL ==================== */
+
+.calc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.calc-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 28px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.calc-display {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  text-align: right;
+  border-radius: 12px;
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  transition: all 0.2s ease;
+}
+
+.calc-display:empty::before {
+  content: '0';
+  color: var(--text-tertiary);
+}
+
+.calc-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.calc-buttons button {
+  padding: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calc-buttons button:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  transform: scale(1.05);
+}
+
+.calc-buttons button:active {
+  transform: scale(0.95);
+}
+
+.calc-buttons button:nth-child(4n),
+.calc-buttons button:nth-child(4n-3) {
+  background: var(--bg-tertiary);
+}
+
+.calc-buttons button:nth-last-child(1) {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  grid-column: span 2;
+}
+
+.calc-buttons button:nth-last-child(1):hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.close-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: var(--accent-danger);
+  border-color: var(--accent-danger);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.close-btn:active {
+  transform: translateY(0);
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .notes-container {
+    padding: 20px;
+  }
+
+  .notes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .notes-header h1 {
+    font-size: 28px;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calc-modal {
+    margin: 20px;
+  }
+
+  .calc-display {
+    font-size: 24px;
+    min-height: 60px;
+  }
+
+  .calc-buttons button {
+    padding: 16px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .redirect-btn span {
+    display: none;
+  }
+
+  .note-input-box {
+    padding: 20px;
+  }
+
+  .calc-buttons {
+    gap: 8px;
+  }
+
+  .calc-buttons button {
+    padding: 14px;
+  }
+}
+
+/* ==================== SMOOTH TRANSITIONS ==================== */
+
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: ease;
+  transition-duration: 0.2s;
+}
