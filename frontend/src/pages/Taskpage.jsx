@@ -39,7 +39,7 @@ function TaskPage() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/api/tasks");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks`);
       setTasks(res.data);
     } catch (err) {
       console.log("Fetch Error:", err.message);
@@ -52,7 +52,7 @@ function TaskPage() {
     if (!title || !dueDate) return;
 
     try {
-      await axios.post("http://localhost:5000/api/tasks", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, {
         title,
         dueDate,
         reminderTime,
@@ -71,7 +71,7 @@ function TaskPage() {
 
   const completeTask = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/tasks/${id}`);
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/tasks`);
       fetchTasks();
     } catch (err) {
       console.log(err.message);
@@ -80,7 +80,7 @@ function TaskPage() {
 
   const deleteTask = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/tasks`);
       fetchTasks();
     } catch (err) {
       console.log(err.message);
