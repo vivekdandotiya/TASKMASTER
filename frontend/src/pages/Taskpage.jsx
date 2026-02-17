@@ -16,30 +16,36 @@ function TaskPage() {
   const [collapsed, setCollapsed] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [theme, setTheme] = useState(() => {
-    // Get theme from localStorage or default to 'dark'
-    return localStorage.getItem('theme') || 'dark';
+    return localStorage.getItem("theme") || "dark";
   });
 
   const location = useLocation();
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchTasks();
   }, []);
 
-  // Apply theme on mount and when it changes
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  // 🔥 FIX FOR TIMEZONE ISSUE
+  const convertToUTC = (localDateTime) => {
+    const date = new Date(localDateTime);
+    return date.toISOString();
   };
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks`);
+      const res = await axios.get(`${API_URL}/api/tasks`);
       setTasks(res.data);
     } catch (err) {
       console.log("Fetch Error:", err.message);
@@ -52,10 +58,12 @@ function TaskPage() {
     if (!title || !dueDate) return;
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/tasks`, {
+      await axios.post(`${API_URL}/api/tasks`, {
         title,
-        dueDate,
-        reminderTime,
+        dueDate: convertToUTC(dueDate),
+        reminderTime: reminderTime
+          ? convertToUTC(reminderTime)
+          : null,
         priority,
       });
 
@@ -71,7 +79,7 @@ function TaskPage() {
 
   const completeTask = async (id) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/tasks`);
+      await axios.put(`${API_URL}/api/tasks/${id}`);
       fetchTasks();
     } catch (err) {
       console.log(err.message);
@@ -80,7 +88,7 @@ function TaskPage() {
 
   const deleteTask = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/tasks`);
+      await axios.delete(`${API_URL}/api/tasks/${id}`);
       fetchTasks();
     } catch (err) {
       console.log(err.message);
@@ -108,8 +116,6 @@ function TaskPage() {
 
   return (
     <div className={`dashboard ${collapsed ? "collapsed" : ""}`}>
-
-      {/* Sidebar */}
       <div className="sidebar">
         <div className="logo">
           <span>🔥</span>
@@ -146,10 +152,7 @@ function TaskPage() {
         </nav>
       </div>
 
-      {/* Main */}
       <div className="main">
-
-        {/* Navbar */}
         <div className="navbar">
           <h1>Dashboard</h1>
 
@@ -163,53 +166,18 @@ function TaskPage() {
           <button
             className="theme-toggle"
             onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            {theme === 'light' ? <FaMoon /> : <FaSun />}
+            {theme === "light" ? <FaMoon /> : <FaSun />}
           </button>
 
           <button
             className="toggle-btn"
             onClick={() => setCollapsed(!collapsed)}
-            aria-label="Toggle sidebar"
           >
             ☰
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="stats">
-          <div className="card red">
-            <div>{tasks.length}</div>
-            <span>Total</span>
-          </div>
-
-          <div className="card green">
-            <div>{tasks.filter((t) => t.completed).length}</div>
-            <span>Completed</span>
-          </div>
-
-          <div className="card yellow">
-            <div>{tasks.filter((t) => !t.completed).length}</div>
-            <span>Pending</span>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="filters">
-          {["all", "pending", "completed"].map((f) => (
-            <button
-              key={f}
-              className={filter === f ? "active" : ""}
-              onClick={() => setFilter(f)}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Add Task */}
         <div className="add-box">
           <input
             placeholder="Enter task..."
@@ -226,12 +194,16 @@ function TaskPage() {
           <input
             type="datetime-local"
             value={reminderTime}
-            onChange={(e) => setReminderTime(e.target.value)}
+            onChange={(e) =>
+              setReminderTime(e.target.value)
+            }
           />
 
           <select
             value={priority}
-            onChange={(e) => setPriority(e.target.value)}
+            onChange={(e) =>
+              setPriority(e.target.value)
+            }
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -243,7 +215,6 @@ function TaskPage() {
           </button>
         </div>
 
-        {/* Task List */}
         <div className="task-list">
           {loading ? (
             <p className="empty">Loading...</p>
@@ -255,39 +226,53 @@ function TaskPage() {
                 <div
                   key={task._id}
                   className={`task-card ${
-                    isOverdue(task.dueDate) && !task.completed
+                    isOverdue(task.dueDate) &&
+                    !task.completed
                       ? "overdue"
                       : ""
                   }`}
                 >
                   <div className="task-info">
                     <h3>{task.title}</h3>
-                    <p>Due: {new Date(task.dueDate).toLocaleString()}</p>
+
+                    <p>
+                      Due:{" "}
+                      {new Date(
+                        task.dueDate
+                      ).toLocaleString()}
+                    </p>
 
                     {task.reminderTime && (
                       <p>
                         Reminder:{" "}
-                        {new Date(task.reminderTime).toLocaleString()}
+                        {new Date(
+                          task.reminderTime
+                        ).toLocaleString()}
                       </p>
                     )}
 
-                    <span className={`priority ${task.priority}`}>
+                    <span
+                      className={`priority ${task.priority}`}
+                    >
                       {task.priority}
                     </span>
                   </div>
 
                   <div className="actions">
                     {!task.completed && (
-                      <button 
-                        onClick={() => completeTask(task._id)}
-                        aria-label="Mark as complete"
+                      <button
+                        onClick={() =>
+                          completeTask(task._id)
+                        }
                       >
                         <FaCheck />
                       </button>
                     )}
-                    <button 
-                      onClick={() => deleteTask(task._id)}
-                      aria-label="Delete task"
+
+                    <button
+                      onClick={() =>
+                        deleteTask(task._id)
+                      }
                     >
                       <FaTrash />
                     </button>
@@ -295,24 +280,17 @@ function TaskPage() {
 
                   <div
                     className={
-                      task.completed ? "status done" : "status pending"
+                      task.completed
+                        ? "status done"
+                        : "status pending"
                     }
                   >
-                    {task.completed ? "Completed" : "Pending"}
+                    {task.completed
+                      ? "Completed"
+                      : "Pending"}
                   </div>
                 </div>
               ))}
-
-              {filteredTasks.length > 3 && (
-                <div className="see-more-wrapper">
-                  <button
-                    className="see-more-btn"
-                    onClick={() => setShowAll(!showAll)}
-                  >
-                    {showAll ? "Show Less" : "See More"}
-                  </button>
-                </div>
-              )}
             </>
           )}
         </div>
