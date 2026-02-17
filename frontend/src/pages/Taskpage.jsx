@@ -147,7 +147,7 @@ function TaskPage() {
               location.pathname === "/calendar" ? "active" : ""
             }`}
           >
-            <span>Calendar</span>
+            <span>Activity Graph</span>
           </Link>
         </nav>
       </div>
