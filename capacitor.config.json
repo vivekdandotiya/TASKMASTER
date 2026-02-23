@@ -1,0 +1,5 @@
+{
+  "appId": "com.vivek.taskmaster",
+  "appName": "MyTask",
+"webDir": "frontend/dist"
+}

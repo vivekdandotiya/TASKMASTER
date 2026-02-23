@@ -6,11 +6,7 @@ import "../notes.css";
 function Notes() {
   const navigate = useNavigate();
 
-  const [notes, setNotes] = useState(() => {
-    // Load notes from localStorage on mount
-    const savedNotes = localStorage.getItem('notes');
-    return savedNotes ? JSON.parse(savedNotes) : [];
-  });
+  const [notes, setNotes] = useState([]);
   
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -21,10 +17,12 @@ function Notes() {
     return localStorage.getItem('theme') || 'dark';
   });
 
-  // Save notes to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('notes', JSON.stringify(notes));
-  }, [notes]);
+  fetch("http://localhost:5000/api/notes")
+    .then(res => res.json())
+    .then(data => setNotes(data))
+    .catch(err => console.log(err));
+}, []);
 
   // Apply theme
   useEffect(() => {
@@ -36,38 +34,33 @@ function Notes() {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
-  // Add / Update Note
-  const handleAddNote = () => {
-    if (!title.trim() || !content.trim()) return;
+  const handleAddNote = async () => {
+  if (!title.trim() || !content.trim()) return;
 
-    if (editingId) {
-      setNotes(
-        notes.map((note) =>
-          note.id === editingId ? { ...note, title: title.trim(), content: content.trim(), updatedAt: new Date().toISOString() } : note
-        )
-      );
-      setEditingId(null);
-    } else {
-      setNotes([
-        ...notes,
-        { 
-          id: Date.now(), 
-          title: title.trim(), 
-          content: content.trim(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-      ]);
-    }
+  try {
+    const res = await fetch("http://localhost:5000/api/notes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ title, content })
+    });
+
+    const newNote = await res.json();
+
+    setNotes([newNote, ...notes]);
 
     setTitle("");
     setContent("");
-  };
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   // Delete
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this note?')) {
-      setNotes(notes.filter((note) => note.id !== id));
+      setNotes(notes.filter((note) => note._id !== id));
     }
   };
 
@@ -75,7 +68,7 @@ function Notes() {
   const handleEdit = (note) => {
     setTitle(note.title);
     setContent(note.content);
-    setEditingId(note.id);
+    setEditingId(note._id);
     // Scroll to input box
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -200,7 +193,7 @@ function Notes() {
           <p className="empty">No notes yet... Create your first note above! ✨</p>
         ) : (
           notes.map((note) => (
-            <div key={note.id} className="note-card">
+            <div key={note._id} className="note-card">
               <h3>{note.title}</h3>
               <p>{note.content}</p>
 
@@ -210,7 +203,7 @@ function Notes() {
                   title="Edit note"
                 />
                 <FaTrash 
-                  onClick={() => handleDelete(note.id)}
+                  onClick={() => handleDelete(note._id)}
                   title="Delete note"
                 />
               </div>
