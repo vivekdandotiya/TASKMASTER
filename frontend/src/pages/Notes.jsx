@@ -1,90 +1,90 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaTrash, FaEdit, FaCalculator, FaSun, FaMoon } from "react-icons/fa";
+import { FaTrash, FaEdit, FaCalculator, FaPlus, FaTimes } from "react-icons/fa";
 import "../notes.css";
 
 function Notes() {
-  const navigate = useNavigate();
-
   const [notes, setNotes] = useState([]);
-  
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [showCalc, setShowCalc] = useState(false);
   const [calcValue, setCalcValue] = useState("");
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark';
-  });
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   useEffect(() => {
-  fetch("http://localhost:5000/api/notes")
-    .then(res => res.json())
-    .then(data => setNotes(data))
-    .catch(err => console.log(err));
-}, []);
+    fetchNotes();
+  }, []);
 
-  // Apply theme
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
-
-  const handleAddNote = async () => {
-  if (!title.trim() || !content.trim()) return;
-
-  try {
-    const res = await fetch("http://localhost:5000/api/notes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ title, content })
-    });
-
-    const newNote = await res.json();
-
-    setNotes([newNote, ...notes]);
-
-    setTitle("");
-    setContent("");
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-  // Delete
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this note?')) {
-      setNotes(notes.filter((note) => note._id !== id));
+  const fetchNotes = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/notes`);
+      const data = await res.json();
+      setNotes(data);
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  // Edit
+  const handleAddNote = async () => {
+    if (!title.trim() || !content.trim()) return;
+
+    try {
+      const url = editingId 
+        ? `${API_URL}/api/notes/${editingId}`
+        : `${API_URL}/api/notes`;
+      
+      const method = editingId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content })
+      });
+
+      const updatedNote = await res.json();
+
+      if (editingId) {
+        setNotes(notes.map(n => n._id === editingId ? updatedNote : n));
+      } else {
+        setNotes([updatedNote, ...notes]);
+      }
+
+      setTitle("");
+      setContent("");
+      setEditingId(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      try {
+        await fetch(`${API_URL}/api/notes/${id}`, { method: "DELETE" });
+        setNotes(notes.filter((note) => note._id !== id));
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
   const handleEdit = (note) => {
     setTitle(note.title);
     setContent(note.content);
     setEditingId(note._id);
-    // Scroll to input box
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Cancel editing
   const handleCancelEdit = () => {
     setTitle("");
     setContent("");
     setEditingId(null);
   };
 
-  // Calculator
   const handleCalc = (value) => {
     if (value === "=") {
       try {
-        // Using Function instead of eval for better security
         const result = Function('"use strict"; return (' + calcValue + ')')();
         setCalcValue(result.toString());
       } catch {
@@ -99,113 +99,65 @@ function Notes() {
     }
   };
 
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.ctrlKey && e.key === 'Enter') {
-        handleAddNote();
-      } else if (e.key === 'Escape' && editingId) {
-        handleCancelEdit();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [title, content, editingId]);
-
   return (
     <div className="notes-container">
-
-      {/* Header */}
-      <div className="notes-header">
-        <h1>📝 Notes</h1>
-
-        <div className="header-buttons">
-          <button 
-            className="redirect-btn" 
-            onClick={() => navigate("/")}
-            aria-label="Go to Dashboard"
-          >
-            <span>Dashboard</span>
-          </button>
-
-          <button 
-            className="theme-toggle-notes" 
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {theme === 'light' ? <FaMoon /> : <FaSun />}
-          </button>
-
-          <button 
-            className="calc-btn" 
-            onClick={() => setShowCalc(true)}
-            aria-label="Open calculator"
-            title="Calculator"
-          >
+      {/* Add/Edit Section */}
+      <div className="apple-card add-note-box">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <h3 className="section-title">{editingId ? "Edit Note" : "New Note"}</h3>
+          <button className="note-action-btn" onClick={() => setShowCalc(true)}>
             <FaCalculator />
           </button>
         </div>
-      </div>
+        
+        <input
+          className="note-input"
+          placeholder="Note Title..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={100}
+        />
 
-      {/* Add/Edit Section */}
-      <div className="note-input-box">
-        <div className="note-input-container">
-          <input
-            type="text"
-            placeholder="Note Title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={100}
-          />
+        <textarea
+          className="note-input note-textarea"
+          placeholder="Start writing... (Ctrl+Enter to save)"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
 
-          <textarea
-            placeholder="Write your note... (Ctrl+Enter to save)"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={handleAddNote} style={{ flex: 1 }}>
-              {editingId ? "Update Note" : "Add Note"}
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="add-note-btn" onClick={handleAddNote}>
+            {editingId ? "Update Note" : "Save Note"}
+          </button>
+          {editingId && (
+            <button 
+              className="note-action-btn" 
+              onClick={handleCancelEdit}
+              style={{ borderRadius: '12px', padding: '0 20px', height: '44px' }}
+            >
+              Cancel
             </button>
-            {editingId && (
-              <button 
-                onClick={handleCancelEdit}
-                style={{ 
-                  background: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border-color)',
-                  boxShadow: 'none'
-                }}
-              >
-                Cancel
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
       {/* Notes List */}
       <div className="notes-grid">
         {notes.length === 0 ? (
-          <p className="empty">No notes yet... Create your first note above! ✨</p>
+          <p className="empty-state">Your thoughts start here... ✍️</p>
         ) : (
           notes.map((note) => (
-            <div key={note._id} className="note-card">
-              <h3>{note.title}</h3>
-              <p>{note.content}</p>
+            <div key={note._id} className="apple-card note-card">
+              <h3 className="note-title">{note.title}</h3>
+              <p className="note-content">{note.content}</p>
 
               <div className="note-actions">
-                <FaEdit 
-                  onClick={() => handleEdit(note)}
-                  title="Edit note"
-                />
-                <FaTrash 
-                  onClick={() => handleDelete(note._id)}
-                  title="Delete note"
-                />
+                <button className="note-action-btn" onClick={() => handleEdit(note)}>
+                  <FaEdit size={14} />
+                </button>
+                <button className="note-action-btn delete" onClick={() => handleDelete(note._id)}>
+                  <FaTrash size={14} />
+                </button>
               </div>
             </div>
           ))
@@ -216,41 +168,31 @@ function Notes() {
       {showCalc && (
         <div 
           className="calc-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowCalc(false);
-            }
-          }}
+          onClick={(e) => e.target === e.currentTarget && setShowCalc(false)}
         >
-          <div className="calc-modal">
+          <div className="calc-modal apple-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontWeight: 700, opacity: 0.7 }}>CALCULATOR</span>
+              <button className="note-action-btn" onClick={() => setShowCalc(false)}><FaTimes /></button>
+            </div>
+            
             <div className="calc-display">{calcValue || '0'}</div>
 
             <div className="calc-buttons">
-              {["7","8","9","/","4","5","6","*","1","2","3","-","0",".","←","+","C","="]
+              {["C", "←", "/", "*", "7", "8", "9", "-", "4", "5", "6", "+", "1", "2", "3", "=", "0", "."]
                 .map((btn, i) => (
                   <button 
                     key={i} 
+                    className={`calc-btn ${["/", "*", "-", "+"].includes(btn) ? "op" : btn === "=" ? "eq" : btn === "C" ? "clr" : ""}`}
                     onClick={() => handleCalc(btn)}
-                    style={btn === "=" ? { gridColumn: 'span 2' } : {}}
                   >
                     {btn}
                   </button>
               ))}
             </div>
-
-            <button 
-              className="close-btn" 
-              onClick={() => {
-                setShowCalc(false);
-                setCalcValue("");
-              }}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
-
     </div>
   );
 }

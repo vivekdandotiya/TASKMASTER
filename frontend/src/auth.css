@@ -1,0 +1,120 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--apple-bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.auth-header {
+  text-align: center;
+}
+
+.auth-logo {
+  width: 64px;
+  height: 64px;
+  background: var(--apple-blue);
+  color: white;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--apple-text);
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  color: var(--apple-secondary-text);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--apple-secondary-text);
+}
+
+.auth-input {
+  background: rgba(142, 142, 147, 0.1);
+  border: 1px solid transparent;
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: var(--apple-text);
+  font-size: 15px;
+  transition: var(--transition-smooth);
+}
+
+.auth-input:focus {
+  background: var(--apple-card);
+  border-color: var(--apple-blue);
+  outline: none;
+}
+
+.auth-btn {
+  background: var(--apple-blue);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 12px;
+  box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+}
+
+.auth-footer {
+  text-align: center;
+  font-size: 14px;
+  color: var(--apple-secondary-text);
+}
+
+.auth-link {
+  color: var(--apple-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  padding: 12px;
+  background: rgba(255, 59, 48, 0.1);
+  color: #FF3B30;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}

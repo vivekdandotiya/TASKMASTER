@@ -1,0 +1,51 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background: var(--apple-bg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 280px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0; /* Prevents overflow-x in flex children */
+}
+
+.app-layout.sidebar-collapsed .main-viewport {
+  margin-left: 80px;
+}
+
+.content-area {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Scrollbar customization for the content area */
+.content-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+  background: rgba(142, 142, 147, 0.2);
+  border-radius: 3px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .main-viewport {
+    margin-left: 0 !important;
+    padding-bottom: 70px; /* Space for the bottom bar */
+  }
+  
+  .content-area {
+    padding: 24px 20px;
+  }
+}
