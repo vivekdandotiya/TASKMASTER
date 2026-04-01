@@ -1,28 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const Note = require("../models/Note");
+const { getNotes, createNote, deleteNote } = require("../controllers/noteController");
+const auth = require("../middleware/authMiddleware");
 
-// Create Note
-router.post("/", async (req, res) => {
-  try {
-    const { title, content } = req.body;
+// All note routes require authentication
+router.use(auth);
 
-    const note = await Note.create({ title, content });
+router.get("/", getNotes);
+router.post("/", createNote);
+router.delete("/:id", deleteNote);
 
-    res.status(201).json(note);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Get All Notes
-router.get("/", async (req, res) => {
-  try {
-    const notes = await Note.find().sort({ createdAt: -1 });
-    res.json(notes);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-module.exports = router;
+module.exports = router;

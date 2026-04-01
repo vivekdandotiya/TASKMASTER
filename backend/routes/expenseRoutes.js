@@ -1,23 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const Expense = require("../models/Expense");
+const { getExpenses, createExpense, deleteExpense } = require("../controllers/expenseController");
+const auth = require("../middleware/authMiddleware");
 
-// GET all
-router.get("/", async (req, res) => {
-  const expenses = await Expense.find().sort({ createdAt: -1 });
-  res.json(expenses);
-});
+// All expense routes require authentication
+router.use(auth);
 
-// CREATE
-router.post("/", async (req, res) => {
-  const expense = await Expense.create(req.body);
-  res.status(201).json(expense);
-});
-
-// DELETE
-router.delete("/:id", async (req, res) => {
-  await Expense.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
-});
+router.get("/", getExpenses);
+router.post("/", createExpense);
+router.delete("/:id", deleteExpense);
 
 module.exports = router;

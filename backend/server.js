@@ -6,7 +6,7 @@ const cors = require("cors");
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
-const noteRoutes = require("./routes/noteRoutes"); // ✅ ADD THIS
+const noteRoutes = require("./routes/noteRoutes");
 
 const app = express();
 
@@ -16,13 +16,14 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/expenses", expenseRoutes);
-app.use("/api/notes", noteRoutes); // ✅ ADD THIS
+app.use("/api/notes", noteRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

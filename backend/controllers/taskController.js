@@ -1,75 +1,57 @@
 const Task = require("../models/Task");
 
-// ================= CREATE TASK =================
-const createTask = async (req, res) => {
+// CREATE
+exports.createTask = async (req, res) => {
   try {
-    const { title, dueDate, reminderTime, priority } = req.body;
-
-    if (!title || !dueDate) {
-      return res.status(400).json({
-        message: "Title and due date required",
-      });
-    }
-
     const task = await Task.create({
-      title,
-      dueDate: new Date(dueDate),
-      reminderTime: reminderTime ? new Date(reminderTime) : null,
-      priority: priority || "medium",
-      completed: false,
-      notified: false,
+      userId: req.user,   // 🔥 THIS FIXES EVERYTHING
+      title: req.body.title,
+      dueDate: req.body.dueDate,
+      reminderTime: req.body.reminderTime,
+      priority: req.body.priority,
     });
 
     res.status(201).json(task);
-
-  } catch (error) {
-    console.log("Create Task Error:", error);
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ================= GET TASKS =================
-const getTasks = async (req, res) => {
+// GET USER TASKS ONLY
+exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find().sort({ createdAt: -1 });
+    const tasks = await Task.find({
+      userId: req.user,   // 🔥 FILTER
+    });
+
     res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-// ================= COMPLETE TASK =================
-const completeTask = async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id);
+// COMPLETE
+exports.completeTask = async (req, res) => {
+  const task = await Task.findOne({
+    _id: req.params.id,
+    userId: req.user,
+  });
 
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
+  if (!task)
+    return res.status(404).json({ message: "Not found" });
 
-    task.completed = true;
-    await task.save();
+  task.completed = true;
+  await task.save();
 
-    res.json(task);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json(task);
 };
 
-// ================= DELETE TASK =================
-const deleteTask = async (req, res) => {
-  try {
-    await Task.findByIdAndDelete(req.params.id);
-    res.json({ message: "Task deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// DELETE
+exports.deleteTask = async (req, res) => {
+  await Task.findOneAndDelete({
+    _id: req.params.id,
+    userId: req.user,
+  });
 
-module.exports = {
-  createTask,
-  getTasks,
-  completeTask,
-  deleteTask,
+  res.json({ message: "Deleted" });
 };

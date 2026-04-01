@@ -6,6 +6,10 @@ const {
   completeTask,
   deleteTask
 } = require("../controllers/taskController");
+const auth = require("../middleware/authMiddleware");
+
+// All task routes require authentication
+router.use(auth);
 
 router.get("/", getTasks);
 router.post("/", createTask);
